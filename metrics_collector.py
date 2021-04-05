@@ -49,7 +49,7 @@ def collect_container_metrics(id):
 
 def main():
 
-    ns_list = ["vmware-system-tkg", "vmware-system-vmop", "vmware-system-capw", "vmware-system-netop", "vmware-system-nsop"]
+    ns_list = ["vmware-system-tkg", "vmware-system-vmop", "vmware-system-capw", "vmware-system-nsop","vmware-system-netop"]
     print("Current SV Node hostname : {}".format(current_sv_node))
     if os.path.exists("resource_metrics.txt"):
         os.remove("resource_metrics.txt")
