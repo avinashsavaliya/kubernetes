@@ -5,7 +5,6 @@ import os
 def run_local_cmd(command):
     try:
         proc = os.popen(command).read().strip()
-        print(proc)
         return proc
     except Exception as e:
         print(e)
@@ -18,7 +17,6 @@ def get_sv_node_id():
 
 def get_active_pods_name(ns):
     cmd = "kubectl get pods -n {ns} -o wide | grep -i {sv_node}".format(ns=ns,sv_node=current_sv_node)+" | awk '{print $1}'"
-    #print("Active Pod command for namespace {} : {}".format(ns, cmd))
     pods = run_local_cmd(cmd).split("\n")
     print("Active PODS are : {}".format(pods))
     return pods
@@ -43,22 +41,18 @@ def retrieve_container_id(pod_name, ns):
 
 def collect_container_metrics(id):
 
-    #cmd = "crictl stats {} >> {}".format(id,fname)
     cmd = "crictl stats {}".format(id)
     stdout = run_local_cmd(cmd)
     print("collector metrics : {}".format(stdout))
     return stdout
 
 
-def write_to_file(data, file_name):
-    with open(file_name, 'w', encoding='utf-8') as f:
-        f.write(data+"\n\n")
-
-
 def main():
 
-    ns_list = ["vmware-system-tkg","vmware-system-nsop"]
+    ns_list = ["vmware-system-tkg", "vmware-system-vmop", "vmware-system-capw", "vmware-system-netop", "vmware-system-nsop"]
     print("Current SV Node hostname : {}".format(current_sv_node))
+    if os.path.exists("resource_metrics.txt"):
+        os.remove("resource_metrics.txt")
 
     for ns in ns_list:
         output = "\n==================================================   " + ns + \
@@ -69,12 +63,9 @@ def main():
 
             output += "\n Pod : " + pod + "   \n\n"
             cid, cname = retrieve_container_id(pod, ns)
-            output += "container name  : " + cname + "     container id : " + cid + "\n\n"
-            #print(output)
+            output += "container name  : " + cname + "     container id : " + cid
             metrics = collect_container_metrics(cid)
             output += "\n" + metrics + "\n"
-
-        #write_to_file(output, ns+".txt")
 
         with open("resource_metrics.txt", 'a+', encoding='utf-8') as f:
             f.write(output + "\n\n")
