@@ -27,6 +27,14 @@ def get_active_pods_name(ns):
 
 
 def retrieve_container_id(pod_name, ns):
+    
+    if "nsx" in pod_name:
+        cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].name}'"
+        cname = run_local_cmd(cmd)
+        id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].containerID}'"
+        cid = run_local_cmd(id_cmd).split("//")[-1]
+        return cid, cname 
+        
     cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[1].name}'"
     cname = run_local_cmd(cmd)
     if str(cname) == 'manager':
@@ -77,7 +85,7 @@ def write_to_excel(metrics_list):
 
 def main():
     metrics_list = []
-    ns_list = ["vmware-system-tkg", "vmware-system-vmop", "vmware-system-capw", "vmware-system-nsop","vmware-system-netop"]
+    ns_list = ["vmware-system-tkg", "vmware-system-vmop", "vmware-system-capw", "vmware-system-nsop","vmware-system-netop","vmware-system-nsx","vmware-system-ako"]
     print("Current SV Node hostname : {}".format(current_sv_node))
     if os.path.exists("resource_metrics.txt"):
         os.remove("resource_metrics.txt")
