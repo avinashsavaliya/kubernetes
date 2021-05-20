@@ -28,27 +28,31 @@ def get_active_pods_name(ns):
 
 def retrieve_container_id(pod_name, ns):
     
-    if "nsx" in pod_name:
-        cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].name}'"
-        cname = run_local_cmd(cmd)
-        id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].containerID}'"
-        cid = run_local_cmd(id_cmd).split("//")[-1]
-        return cid, cname 
+    try:
         
-    cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[1].name}'"
-    cname = run_local_cmd(cmd)
-    if str(cname) == 'manager':
-        id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[1].containerID}'"
-        cid = run_local_cmd(id_cmd).split("//")[-1]
-        return cid, cname
-
-    else:
-        cmd = "kubectl get pod {} -n {}".format(pod_name, ns) + " -o jsonpath='{.status.containerStatuses[0].name}'"
-        cname = run_local_cmd(cmd)
-        if str(cname) == 'manager':
+    
+        if "nsx" in pod_name:
+            cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].name}'"
+            cname = run_local_cmd(cmd)
             id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].containerID}'"
             cid = run_local_cmd(id_cmd).split("//")[-1]
+            return cid, cname 
+
+        cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[1].name}'"
+        cname = run_local_cmd(cmd)
+        if str(cname) == 'manager':
+            id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[1].containerID}'"
+            cid = run_local_cmd(id_cmd).split("//")[-1]
             return cid, cname
+
+        else:
+            cmd = "kubectl get pod {} -n {}".format(pod_name, ns) + " -o jsonpath='{.status.containerStatuses[0].name}'"
+            cname = run_local_cmd(cmd)
+            if str(cname) == 'manager':
+                id_cmd = "kubectl get pod {} -n {}".format(pod_name,ns) + " -o jsonpath='{.status.containerStatuses[0].containerID}'"
+                cid = run_local_cmd(id_cmd).split("//")[-1]
+                return cid, cname
+     
 
 
 def collect_container_metrics(id):
