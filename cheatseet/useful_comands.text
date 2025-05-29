@@ -1,0 +1,7 @@
+# List CPU and Memory Limit for for all pods in given namespace
+
+ kubectl get pods -n <ns_name> -o custom-columns='pod:.metadata.name, cpu.limit:.spec.containers[*].resources.limits.cpu, mem.limit:.spec.containers[*].resources.limits.memory'
+ 
+pod     cpu.limit    mem.limit                                                         
+x       <none>       2900Mi,100Mi
+y       <none>       1200Mi,100Mi
